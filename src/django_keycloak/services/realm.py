@@ -1,5 +1,7 @@
+from __future__ import absolute_import
+
 from keycloak.realm import KeycloakRealm
-from keycloak.exceptions import KeycloakClientError
+from .exceptions import MissingRealmConfiguration
 
 try:
     from urllib.parse import urlparse
@@ -72,7 +74,7 @@ def get_issuer(realm):
     try:
         issuer = realm.well_known_oidc['issuer']
     except Exception as e:
-        raise KeycloakClientError(
+        raise MissingRealmConfiguration(
             "Error %s getting issuer.  Check Realm and Client correctly set up.  Run= Refresh OpenID Connect .well-known and Refresh Certificates run in admin" % e)
 
     if realm.server.internal_url:

@@ -129,9 +129,9 @@ class KeycloakPasswordCredentialsBackend(KeycloakAuthorizationBase):
                     username=username,
                     password=password
                 )
-        except KeycloakClientError:
+        except (KeycloakClientError, django_keycloak.services.exceptions.MissingRealmConfiguration):
             logger.debug('KeycloakPasswordCredentialsBackend: failed to '
-                         'authenticate.')
+                         'authenticate.', exc_info=True)
         else:
             return keycloak_openid_profile.user
 
@@ -155,15 +155,18 @@ class KeycloakIDTokenAuthorizationBackend(KeycloakAuthorizationBase):
         except ExpiredSignatureError:
             # If the signature has expired.
             logger.debug('KeycloakBearerAuthorizationBackend: failed to '
-                         'authenticate due to an expired access token.')
+                         'authenticate due to an expired access token.', exc_info=True)
         except JWTClaimsError as e:
             logger.debug('KeycloakBearerAuthorizationBackend: failed to '
                          'authenticate due to failing claim checks: "%s"'
-                         % str(e))
+                         % str(e), exc_info=True)
         except JWTError:
             # The signature is invalid in any way.
             logger.debug('KeycloakBearerAuthorizationBackend: failed to '
-                         'authenticate due to a malformed access token.')
+                         'authenticate due to a malformed access token.', exc_info=True)
+        except (KeycloakClientError, django_keycloak.services.exceptions.MissingRealmConfiguration):
+            logger.debug('KeycloakBearerAuthorizationBackend: failed to '
+                         'authenticate.', exc_info=True)
         else:
             return oidc_profile.user
 

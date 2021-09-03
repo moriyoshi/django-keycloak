@@ -6,3 +6,7 @@ class KeycloakOpenIdProfileNotFound(Exception):
 
 class TokensExpired(Exception):
     pass
+
+
+class MissingRealmConfiguration(Exception):
+    pass
